@@ -1,2 +1,2 @@
 # CurriculumExamples
-This contains for different programs which student come across in their curriculum
+This contains for different programs which students come across in their curriculum.
