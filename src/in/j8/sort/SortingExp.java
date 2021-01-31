@@ -27,8 +27,9 @@ public class SortingExp {
 
 		System.out.println("Sorting.......");
 		System.out.println("By Name:");
-		students.sort(Comparator.comparing(Student::getName));
-		printStudents(students);
+ 		List<Student> ex0 = new ArrayList<Student>(students);
+ 		ex0.sort(Comparator.comparing(Student::getName));
+		printStudents(ex0);
 
 		System.out.println("By course, score and name:");
 		List<Student> ex1 = new ArrayList<Student>(students);
