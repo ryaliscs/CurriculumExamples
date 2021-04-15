@@ -264,8 +264,8 @@ public class AESEncryption {
 	}
 
 	/**
-	 * generateIv: IV is a pseudo-random value and has the same size as the block that is
-	 * encrypted. 
+	 * generateIv: IV is a pseudo-random value and has the same size as the block
+	 * that is encrypted.
 	 * 
 	 * @return IvParameterSpec
 	 */
