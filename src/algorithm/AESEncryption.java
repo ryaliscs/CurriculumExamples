@@ -373,7 +373,7 @@ public class AESEncryption {
 
 		byte[] key = (aKey).getBytes("UTF-8");
 
-		KeySpec spec = new PBEKeySpec((new String(key)).toCharArray(), aSalt.getBytes(), 65536, 256);
+		KeySpec spec = new PBEKeySpec((new String(key)).toCharArray(), aSalt.getBytes(), 1100, 256);
 		SecretKey secret = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), AES);
 
 		return secret;
