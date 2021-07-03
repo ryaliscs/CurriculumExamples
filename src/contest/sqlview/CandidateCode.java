@@ -15,6 +15,7 @@ import java.util.Scanner;
 public class CandidateCode {
 
 	public static void main(String[] args) {
+		boolean debug = true;
 		Integer destination_house = -1;
 		int noOfRoads = -1;
 
@@ -25,7 +26,8 @@ public class CandidateCode {
 			destination_house = Integer.valueOf(input_split[0]);
 			noOfRoads = Integer.parseInt(input_split[1]);
 			roadMap = getRoadMap(sc, destination_house, noOfRoads);
-			System.out.println(roadMap);
+			if (debug)
+				System.out.println(roadMap);
 		}
 
 		if (roadMap.isEmpty()) {
@@ -34,13 +36,15 @@ public class CandidateCode {
 		} else {
 			Node root = new Node(Integer.valueOf(1));
 			PointWeight shortPathCost = new PointWeight();
-			shortPathCost.weight = Integer.MAX_VALUE;
+			shortPathCost.weight = -1;
 			findPath(roadMap, root, destination_house, shortPathCost);
 			if (shortPathCost.weight < 0) {
-				System.out.println(0);
+				System.out.println("NOT POSSIBLE");
+			} else {
+				System.out.println(shortPathCost.weight);
 			}
-			System.out.println(shortPathCost.weight);
-			System.out.print(root);
+			if (debug)
+				System.out.print(root);
 
 		}
 	}
@@ -50,13 +54,14 @@ public class CandidateCode {
 		List<PointWeight> pws = roadMap.get(node.nodeValue);
 		if (pws != null) {
 			for (PointWeight pw : pws) {
-				if (node.hasPath(pw.to) || node.hasPath(destinationHouse)) {
+				if (node.hasNode(pw.to) || node.hasNode(destinationHouse)) {
 					continue;
 				}
-				int pathCost = (pw.weight - node.weight) + node.weight;
+				int pathCost = (pw.weight - node.weight);
+				pathCost = ((pathCost < 0) ? 0 : pathCost) + node.weight;
 				Node child = node.addChild(pw.to, pathCost);
 				if (pw.to == destinationHouse) {
-					if (shortPathCost.weight > child.weight) {
+					if (shortPathCost.weight > child.weight || shortPathCost.weight == -1) {
 						shortPathCost.weight = child.weight;
 					}
 				}
@@ -78,13 +83,13 @@ public class CandidateCode {
 	private static class Node {
 		Integer nodeValue;
 		int weight;
-		String path;
+		List<Integer> paths = new ArrayList<>();
 		List<Node> childs;
 
 		public Node(Integer value) {
 			this.nodeValue = value;
 			weight = 0;
-			path = value + "";
+			paths.add(value);
 
 		}
 
@@ -94,24 +99,28 @@ public class CandidateCode {
 			}
 			Node node = new Node(value);
 			node.weight = weight;
-			node.path = this.path + "->" + value;
+			node.paths.addAll(this.paths);
 			this.childs.add(node);
 			return node;
 		}
 
-		public boolean hasPath(Integer pathValue) {
-			return this.path.indexOf(pathValue.toString()) != -1;
+		public boolean hasNode(Integer pathValue) {
+			return this.paths.indexOf(pathValue) != -1;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			Node o = (Node) obj;
+			return o.nodeValue.equals(nodeValue);
 		}
 
 		@Override
 		public String toString() {
-			String result = nodeValue + " (" + weight + ") (" + path + ")\n";
+			String result = nodeValue + " (" + weight + ") (" + paths + ")\n";
 			if (this.childs != null) {
-				result += "[";
 				for (Node child : childs) {
 					result += child;
 				}
-				result += "]";
 			}
 
 			return result;
@@ -129,8 +138,9 @@ public class CandidateCode {
 			Integer to = Integer.valueOf(input_split[1]);
 			int weight = Integer.valueOf(input_split[2]).intValue();
 
-			if (from.intValue() == destinationHouse.intValue() || //
-					to.intValue() == destinationHouse.intValue()) {
+			boolean isFromEqualsToDestination = from.intValue() == destinationHouse.intValue();
+			boolean isToEqualsToDestination = to.intValue() == destinationHouse.intValue();
+			if (isFromEqualsToDestination || isToEqualsToDestination) {
 				hasStopHouse = true;
 			}
 
@@ -139,11 +149,15 @@ public class CandidateCode {
 			}
 
 			// bi-directional add both sides
-			updateRouteMap(mapRoadMap, from, to, weight); // a -> b
-			updateRouteMap(mapRoadMap, to, from, weight); // b -> a
+			if (!isFromEqualsToDestination && to.intValue() != 1) {
+				updateRouteMap(mapRoadMap, from, to, weight); // a -> b
+			}
+			if (!isToEqualsToDestination && from.intValue() != 1) {
+				updateRouteMap(mapRoadMap, to, from, weight); // b -> a
+			}
 		}
 
-		if (!hasStopHouse || !hasStartHouse) {
+		if (!hasStopHouse && !hasStartHouse) {
 			return Collections.emptyMap();
 		}
 		return mapRoadMap;
