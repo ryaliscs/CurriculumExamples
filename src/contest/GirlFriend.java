@@ -1,4 +1,4 @@
-package contest.sqlview;
+package contest;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,7 +12,7 @@ import java.util.Scanner;
  * 
  *
  */
-public class CandidateCode {
+public class GirlFriend {
 
 	public static void main(String[] args) {
 		boolean debug = true;
@@ -59,8 +59,11 @@ public class CandidateCode {
 				}
 				int pathCost = (pw.weight - node.weight);
 				pathCost = ((pathCost < 0) ? 0 : pathCost) + node.weight;
+				if (pathCost > shortPathCost.weight && shortPathCost.weight != -1) {
+					continue;
+				}
 				Node child = node.addChild(pw.to, pathCost);
-				if (pw.to == destinationHouse) {
+				if (pw.to.equals(destinationHouse)) {
 					if (shortPathCost.weight > child.weight || shortPathCost.weight == -1) {
 						shortPathCost.weight = child.weight;
 					}
@@ -149,15 +152,23 @@ public class CandidateCode {
 			}
 
 			// bi-directional add both sides
-			if (!isFromEqualsToDestination && to.intValue() != 1) {
+			// if (!isFromEqualsToDestination && to.intValue() != 1)
+			{
 				updateRouteMap(mapRoadMap, from, to, weight); // a -> b
 			}
-			if (!isToEqualsToDestination && from.intValue() != 1) {
+			// if (!isToEqualsToDestination && from.intValue() != 1)
+			{
 				updateRouteMap(mapRoadMap, to, from, weight); // b -> a
 			}
 		}
 
+		System.out.println(mapRoadMap);
 		if (!hasStopHouse && !hasStartHouse) {
+			return Collections.emptyMap();
+		}
+
+		if (mapRoadMap.get(destinationHouse) == null || //
+				mapRoadMap.get(Integer.valueOf(1)) == null) {
 			return Collections.emptyMap();
 		}
 		return mapRoadMap;
