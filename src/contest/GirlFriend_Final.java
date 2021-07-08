@@ -1,7 +1,5 @@
 package contest;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,11 +14,9 @@ import java.util.Scanner;
  * 
  *
  */
-public class GirlFriend_02 {
+public class GirlFriend_Final {
 
 	public static void main(String[] args) {
-		boolean debug = true;
-		Instant start = Instant.now();
 		int destination_house = -1;
 		int noOfRoads = -1;
 
@@ -31,24 +27,9 @@ public class GirlFriend_02 {
 			destination_house = Integer.parseInt(input_split[0]);
 			noOfRoads = Integer.parseInt(input_split[1]);
 			roadMap = getRoadMap(sc, destination_house, noOfRoads);
-			if (debug)
-				System.out.println(roadMap);
 		}
-		if (debug) {
-			Instant end = Instant.now();
-			Duration timeElapsed = Duration.between(start, end);
-			System.out.println("Input ->" + timeElapsed.toSeconds() + " sec");
-		}
-
-		// testData(roadMap);
 
 		findShortestPathCost(destination_house, roadMap);
-
-		if (debug) {
-			Instant finalEnd = Instant.now();
-			Duration totalTimeElapsed = Duration.between(start, finalEnd);
-			System.out.println("\nfinal ->" + totalTimeElapsed.toSeconds() + " sec");
-		}
 
 	}
 
@@ -90,11 +71,6 @@ public class GirlFriend_02 {
 							nodes.add(node);
 					}
 				}
-
-				{
-					System.out.println(nodes);
-					System.out.println("Shortest Path cost:" + shortPathCost);
-				}
 			}
 
 			if (shortPathCost < 0) {
@@ -119,19 +95,6 @@ public class GirlFriend_02 {
 		}
 		return false;
 
-	}
-
-	private static void testData(Map<Integer, List<PointWeight>> roadMap) {
-
-		for (Map.Entry<Integer, List<PointWeight>> entry : roadMap.entrySet()) {
-
-			List<PointWeight> list = roadMap.get(entry.getKey());
-			System.out.println(entry.getKey());
-			for (PointWeight pw : list) {
-				System.out.print(pw);
-			}
-			System.out.println();
-		}
 	}
 
 	private static class PointWeight {
