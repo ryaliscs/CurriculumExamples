@@ -30,7 +30,6 @@ public class GirlFriend_Final {
 		}
 
 		findShortestPathCost(destination_house, roadMap);
-
 	}
 
 	private static void findShortestPathCost(int destination_house, Map<Integer, List<PointWeight>> roadMap) {
@@ -43,6 +42,8 @@ public class GirlFriend_Final {
 			int shortPathCost = -1;
 			Queue<Node> nodes = new LinkedList<Node>();
 			nodes.add(root);
+			boolean isRoot = true;
+			boolean isShortestPathFound = false;
 
 			Map<Integer, Integer> nodeWeights = new HashMap<Integer, Integer>();
 			while (true) {
@@ -51,9 +52,14 @@ public class GirlFriend_Final {
 					break;
 				}
 				Node parent = nodes.remove();
-				List<PointWeight> childNodes = roadMap.get(parent.nodeValue);
+				//
+				if(isShortestPathFound && parent.weight >= shortPathCost) {
+					continue;
+				}
+				//
+				List<PointWeight> childNodes = roadMap.get(parent.nodeValue);				
 				for (PointWeight pw : childNodes) {
-					Node node = new Node(pw.to, parent.paths, pw.weight, parent.weight);
+					Node node = new Node(pw.to, parent.paths, pw.weight, parent.weight, isRoot);					
 					if (!isValidNodeWeight(nodeWeights, node)) {
 						continue;
 					}
@@ -63,6 +69,7 @@ public class GirlFriend_Final {
 						if (node.nodeValue == destination_house
 								&& (shortPathCost == -1 || shortPathCost > node.weight)) {
 							shortPathCost = node.weight;
+							isShortestPathFound = true;
 							isAdd = false;
 						} else if (shortPathCost != -1 && node.weight >= shortPathCost) {
 							isAdd = false;
@@ -71,14 +78,18 @@ public class GirlFriend_Final {
 							nodes.add(node);
 					}
 				}
+				isRoot = false;
+
 			}
 
-			if (shortPathCost < 0) {
+			if(!isShortestPathFound) {
 				System.out.print("NOT POSSIBLE");
+			}
+			else if (shortPathCost < 0) {
+				System.out.print("0");
 			} else {
 				System.out.print(shortPathCost);
 			}
-
 		}
 	}
 
@@ -119,11 +130,15 @@ public class GirlFriend_Final {
 
 		}
 
-		public Node(int nodeValue, List<Integer> aPaths, int childWeight, int parentWeight) {
+		public Node(int nodeValue, List<Integer> aPaths, int childWeight, int parentWeight, boolean aIsRoot) {
 			this.nodeValue = nodeValue;
 			this.paths.addAll(aPaths);
-			int pathCost = (childWeight - parentWeight);
-			this.weight = ((pathCost < 0) ? 0 : pathCost) + parentWeight;
+			if (aIsRoot) {
+				this.weight = childWeight;
+			} else {
+				int pathCost = (childWeight - parentWeight);
+				this.weight = ((pathCost < 0) ? 0 : pathCost) + parentWeight;
+			}
 		}
 
 		public boolean hasNode() {
@@ -197,5 +212,4 @@ public class GirlFriend_Final {
 		pw.weight = weight;
 		values.add(pw);
 	}
-
 }

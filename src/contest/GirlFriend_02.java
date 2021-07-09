@@ -31,8 +31,8 @@ public class GirlFriend_02 {
 			destination_house = Integer.parseInt(input_split[0]);
 			noOfRoads = Integer.parseInt(input_split[1]);
 			roadMap = getRoadMap(sc, destination_house, noOfRoads);
-			if (debug)
-				System.out.println(roadMap);
+//			if (debug)
+//				System.out.println(roadMap);
 		}
 		if (debug) {
 			Instant end = Instant.now();
@@ -62,6 +62,8 @@ public class GirlFriend_02 {
 			int shortPathCost = -1;
 			Queue<Node> nodes = new LinkedList<Node>();
 			nodes.add(root);
+			boolean isRoot = true;
+			boolean isShortestPathFound = false;
 
 			Map<Integer, Integer> nodeWeights = new HashMap<Integer, Integer>();
 			while (true) {
@@ -70,10 +72,15 @@ public class GirlFriend_02 {
 					break;
 				}
 				Node parent = nodes.remove();
+				//
+				if (isShortestPathFound && parent.weight >= shortPathCost) {
+					continue;
+				}
+				//
 				List<PointWeight> childNodes = roadMap.get(parent.nodeValue);
 				for (PointWeight pw : childNodes) {
-					Node node = new Node(pw.to, parent.paths, pw.weight, parent.weight);
-					if (!isValidNodeWeight(nodeWeights, node)) {
+					Node node = new Node(pw.to, parent.paths, pw.weight, parent.weight, isRoot);
+					if (!isValidNodeWeight(nodeWeights, node, nodes)) {
 						continue;
 					}
 					boolean isAdd = node.nodeValue > parent.nodeValue || !node.hasNode();
@@ -82,37 +89,41 @@ public class GirlFriend_02 {
 						if (node.nodeValue == destination_house
 								&& (shortPathCost == -1 || shortPathCost > node.weight)) {
 							shortPathCost = node.weight;
+							isShortestPathFound = true;
 							isAdd = false;
 						} else if (shortPathCost != -1 && node.weight >= shortPathCost) {
 							isAdd = false;
 						}
-						if (isAdd)
+						if (isAdd) {									
 							nodes.add(node);
+						}
 					}
 				}
-
-				{
-					System.out.println(nodes);
-					System.out.println("Shortest Path cost:" + shortPathCost);
-				}
+				isRoot = false;
+//				{
+//					System.out.println(nodes);
+//					System.out.println("Shortest Path cost:" + shortPathCost);
+//				}
 			}
 
-			if (shortPathCost < 0) {
+			if (!isShortestPathFound) {
 				System.out.print("NOT POSSIBLE");
+			} else if (shortPathCost < 0) {
+				System.out.print("0");
 			} else {
 				System.out.print(shortPathCost);
 			}
-
 		}
 	}
 
-	private static boolean isValidNodeWeight(Map<Integer, Integer> nodeWeights, Node node) {
+	private static boolean isValidNodeWeight(Map<Integer, Integer> nodeWeights, Node node, Queue<Node> nodes) {
 		Integer weight = nodeWeights.get(Integer.valueOf(node.nodeValue));
 		if (weight == null) {
 			nodeWeights.put(Integer.valueOf(node.nodeValue), Integer.valueOf(node.weight));
 			return true;
 		} else if (weight.intValue() > node.weight) {
-			nodeWeights.put(Integer.valueOf(node.nodeValue), Integer.valueOf(node.weight));
+			nodes.remove(node);
+			nodeWeights.put(Integer.valueOf(node.nodeValue), Integer.valueOf(node.weight));			
 			return true;
 		} else if (weight.intValue() == node.weight) {
 			return false;
@@ -156,11 +167,15 @@ public class GirlFriend_02 {
 
 		}
 
-		public Node(int nodeValue, List<Integer> aPaths, int childWeight, int parentWeight) {
+		public Node(int nodeValue, List<Integer> aPaths, int childWeight, int parentWeight, boolean aIsRoot) {
 			this.nodeValue = nodeValue;
 			this.paths.addAll(aPaths);
-			int pathCost = (childWeight - parentWeight);
-			this.weight = ((pathCost < 0) ? 0 : pathCost) + parentWeight;
+			if (aIsRoot) {
+				this.weight = childWeight;
+			} else {
+				int pathCost = (childWeight - parentWeight);
+				this.weight = ((pathCost < 0) ? 0 : pathCost) + parentWeight;
+			}
 		}
 
 		public boolean hasNode() {
