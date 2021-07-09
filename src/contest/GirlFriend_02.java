@@ -72,6 +72,12 @@ public class GirlFriend_02 {
 					break;
 				}
 				Node parent = nodes.remove();
+				Integer xyz = nodeWeights.get(parent.nodeValue);
+				if (xyz != null) {
+					if (parent.weight > xyz.intValue()) {
+						continue;
+					}
+				}
 				//
 				if (isShortestPathFound && parent.weight >= shortPathCost) {
 					continue;
@@ -80,7 +86,7 @@ public class GirlFriend_02 {
 				List<PointWeight> childNodes = roadMap.get(parent.nodeValue);
 				for (PointWeight pw : childNodes) {
 					Node node = new Node(pw.to, parent.paths, pw.weight, parent.weight, isRoot);
-					if (!isValidNodeWeight(nodeWeights, node, nodes)) {
+					if (!isValidNodeWeight(nodeWeights, node)) {
 						continue;
 					}
 					boolean isAdd = node.nodeValue > parent.nodeValue || !node.hasNode();
@@ -94,16 +100,16 @@ public class GirlFriend_02 {
 						} else if (shortPathCost != -1 && node.weight >= shortPathCost) {
 							isAdd = false;
 						}
-						if (isAdd) {									
+						if (isAdd) {
 							nodes.add(node);
 						}
 					}
 				}
 				isRoot = false;
-//				{
-//					System.out.println(nodes);
-//					System.out.println("Shortest Path cost:" + shortPathCost);
-//				}
+				{
+					System.out.println(nodes);
+					System.out.println("Shortest Path cost:" + shortPathCost);
+				}
 			}
 
 			if (!isShortestPathFound) {
@@ -116,14 +122,13 @@ public class GirlFriend_02 {
 		}
 	}
 
-	private static boolean isValidNodeWeight(Map<Integer, Integer> nodeWeights, Node node, Queue<Node> nodes) {
+	private static boolean isValidNodeWeight(Map<Integer, Integer> nodeWeights, Node node) {
 		Integer weight = nodeWeights.get(Integer.valueOf(node.nodeValue));
 		if (weight == null) {
 			nodeWeights.put(Integer.valueOf(node.nodeValue), Integer.valueOf(node.weight));
 			return true;
 		} else if (weight.intValue() > node.weight) {
-			nodes.remove(node);
-			nodeWeights.put(Integer.valueOf(node.nodeValue), Integer.valueOf(node.weight));			
+			nodeWeights.put(Integer.valueOf(node.nodeValue), Integer.valueOf(node.weight));
 			return true;
 		} else if (weight.intValue() == node.weight) {
 			return false;

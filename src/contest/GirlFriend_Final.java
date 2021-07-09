@@ -52,6 +52,12 @@ public class GirlFriend_Final {
 					break;
 				}
 				Node parent = nodes.remove();
+				Integer xyz = nodeWeights.get(parent.nodeValue);
+				if (xyz != null) {
+					if (parent.weight > xyz.intValue()) {
+						continue;
+					}
+				}
 				//
 				if(isShortestPathFound && parent.weight >= shortPathCost) {
 					continue;
