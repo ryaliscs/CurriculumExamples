@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Scanner;
 
 /**
@@ -66,7 +65,7 @@ public class GirlFriend_02 {
 			nodes.add(root);
 			boolean isShortestPathFound = false;
 
-			Map<Integer, Integer> nodeWeights = new HashMap<Integer, Integer>();
+			Map<Integer, Integer> nodeWeights = new HashMap<Integer, Integer>(roadMap.size());
 
 			while (true) {
 				int size = nodes.size();
@@ -104,15 +103,7 @@ public class GirlFriend_02 {
 							isAdd = false;
 						}
 						if (isAdd) {
-							int indexOf = nodes.indexOf(node);
-							if (indexOf != -1) {
-								Node duplicateNode = nodes.get(indexOf);
-								if (duplicateNode.weight > node.weight) {
-									nodes.set(indexOf, node);
-								}
-							} else {
-								nodes.add(node);
-							}
+							nodes.add(node);
 						}
 					}
 				}
@@ -168,18 +159,19 @@ public class GirlFriend_02 {
 	private static class Node {
 		int nodeValue;
 		int weight;
-		List<Integer> paths = new ArrayList<>();
+		List<Integer> paths;
 
 		public Node(int value) {
 			this.nodeValue = value;
 			weight = 0;
+			paths = new ArrayList<>(1);
 			paths.add(Integer.valueOf(value));
 
 		}
 
 		public Node(int nodeValue, List<Integer> aPaths, int childWeight, int parentWeight) {
 			this.nodeValue = nodeValue;
-			this.paths.addAll(aPaths);
+			this.paths = new ArrayList<Integer>(aPaths);
 			int pathCost = (childWeight - parentWeight);
 			this.weight = ((pathCost < 0) ? 0 : pathCost) + parentWeight;
 		}
@@ -207,7 +199,7 @@ public class GirlFriend_02 {
 	}
 
 	private static Map<Integer, List<PointWeight>> getRoadMap(Scanner sc, int destinationHouse, int noOfRoads) {
-		Map<Integer, List<PointWeight>> mapRoadMap = new HashMap<>();
+		Map<Integer, List<PointWeight>> mapRoadMap = new HashMap<>(destinationHouse);
 		boolean hasStopHouse = false;
 		boolean hasStartHouse = false;
 		for (int i = 0; i < noOfRoads; i++) {
@@ -247,7 +239,7 @@ public class GirlFriend_02 {
 		Integer intFrom = Integer.valueOf(from);
 		List<PointWeight> values = mapRoadMap.get(intFrom);
 		if (values == null) {
-			values = new ArrayList<>(10);
+			values = new ArrayList<>(500);
 			mapRoadMap.put(intFrom, values);
 		}
 		PointWeight pw = new PointWeight();
