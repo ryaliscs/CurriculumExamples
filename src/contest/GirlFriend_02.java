@@ -38,9 +38,8 @@ public class GirlFriend_02 {
 			Instant end = Instant.now();
 			Duration timeElapsed = Duration.between(start, end);
 			System.out.println("Input ->" + timeElapsed.toSeconds() + " sec");
+			start = Instant.now();
 		}
-
-		// testData(roadMap);
 
 		findShortestPathCost(destination_house, roadMap);
 
@@ -48,6 +47,7 @@ public class GirlFriend_02 {
 			Instant finalEnd = Instant.now();
 			Duration totalTimeElapsed = Duration.between(start, finalEnd);
 			System.out.println("\nfinal ->" + totalTimeElapsed.toSeconds() + " sec");
+			System.out.println("\nfinal ->" + totalTimeElapsed.toMillis() + " milli");
 		}
 
 	}
@@ -59,33 +59,36 @@ public class GirlFriend_02 {
 		} else {
 			Node root = new Node(1);
 
+			int counter = 0;
+
 			int shortPathCost = -1;
-			Queue<Node> nodes = new LinkedList<Node>();
+			LinkedList<Node> nodes = new LinkedList<Node>();
 			nodes.add(root);
-			boolean isRoot = true;
 			boolean isShortestPathFound = false;
 
 			Map<Integer, Integer> nodeWeights = new HashMap<Integer, Integer>();
+
 			while (true) {
 				int size = nodes.size();
 				if (0 == size) {
 					break;
 				}
 				Node parent = nodes.remove();
-				Integer xyz = nodeWeights.get(parent.nodeValue);
-				if (xyz != null) {
-					if (parent.weight > xyz.intValue()) {
-						continue;
-					}
-				}
-				//
+
 				if (isShortestPathFound && parent.weight >= shortPathCost) {
 					continue;
 				}
-				//
+
+				Integer currentNodeWeight = nodeWeights.get(parent.nodeValue);
+				if (currentNodeWeight != null) {
+					if (parent.weight > currentNodeWeight.intValue()) {
+						continue;
+					}
+				}
+
 				List<PointWeight> childNodes = roadMap.get(parent.nodeValue);
 				for (PointWeight pw : childNodes) {
-					Node node = new Node(pw.to, parent.paths, pw.weight, parent.weight, isRoot);
+					Node node = new Node(pw.to, parent.paths, pw.weight, parent.weight);
 					if (!isValidNodeWeight(nodeWeights, node)) {
 						continue;
 					}
@@ -101,16 +104,26 @@ public class GirlFriend_02 {
 							isAdd = false;
 						}
 						if (isAdd) {
-							nodes.add(node);
+							int indexOf = nodes.indexOf(node);
+							if (indexOf != -1) {
+								Node duplicateNode = nodes.get(indexOf);
+								if (duplicateNode.weight > node.weight) {
+									nodes.set(indexOf, node);
+								}
+							} else {
+								nodes.add(node);
+							}
 						}
 					}
 				}
-				isRoot = false;
-				{
-					System.out.println(nodes);
-					System.out.println("Shortest Path cost:" + shortPathCost);
-				}
+				counter++;
+
+//				System.out.println(nodes);
+//				System.out.println("Shortest Path cost:" + shortPathCost);
+//				System.out.println("No. of iterations:" + counter);
 			}
+
+			System.out.println("No. of iterations:" + counter);
 
 			if (!isShortestPathFound) {
 				System.out.print("NOT POSSIBLE");
@@ -137,26 +150,18 @@ public class GirlFriend_02 {
 
 	}
 
-	private static void testData(Map<Integer, List<PointWeight>> roadMap) {
-
-		for (Map.Entry<Integer, List<PointWeight>> entry : roadMap.entrySet()) {
-
-			List<PointWeight> list = roadMap.get(entry.getKey());
-			System.out.println(entry.getKey());
-			for (PointWeight pw : list) {
-				System.out.print(pw);
-			}
-			System.out.println();
-		}
-	}
-
-	private static class PointWeight {
+	private static class PointWeight implements Comparable<PointWeight> {
 		public int to;
 		public int weight;
 
 		@Override
 		public String toString() {
 			return to + " (" + weight + ")";
+		}
+
+		@Override
+		public int compareTo(PointWeight aPW) {
+			return aPW.weight - weight;
 		}
 	}
 
@@ -172,15 +177,11 @@ public class GirlFriend_02 {
 
 		}
 
-		public Node(int nodeValue, List<Integer> aPaths, int childWeight, int parentWeight, boolean aIsRoot) {
+		public Node(int nodeValue, List<Integer> aPaths, int childWeight, int parentWeight) {
 			this.nodeValue = nodeValue;
 			this.paths.addAll(aPaths);
-			if (aIsRoot) {
-				this.weight = childWeight;
-			} else {
-				int pathCost = (childWeight - parentWeight);
-				this.weight = ((pathCost < 0) ? 0 : pathCost) + parentWeight;
-			}
+			int pathCost = (childWeight - parentWeight);
+			this.weight = ((pathCost < 0) ? 0 : pathCost) + parentWeight;
 		}
 
 		public boolean hasNode() {
@@ -254,5 +255,4 @@ public class GirlFriend_02 {
 		pw.weight = weight;
 		values.add(pw);
 	}
-
 }
