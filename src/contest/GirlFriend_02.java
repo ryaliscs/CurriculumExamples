@@ -48,7 +48,6 @@ public class GirlFriend_02 {
 			System.out.println("\nfinal ->" + totalTimeElapsed.toSeconds() + " sec");
 			System.out.println("\nfinal ->" + totalTimeElapsed.toMillis() + " milli");
 		}
-
 	}
 
 	private static void findShortestPathCost(int destination_house, Map<Integer, List<PointWeight>> roadMap) {
@@ -67,11 +66,7 @@ public class GirlFriend_02 {
 
 			Map<Integer, Integer> nodeWeights = new HashMap<Integer, Integer>(roadMap.size());
 
-			while (true) {
-				int size = nodes.size();
-				if (0 == size) {
-					break;
-				}
+			while (!nodes.isEmpty()) {
 				Node parent = nodes.remove();
 
 				if (isShortestPathFound && parent.weight >= shortPathCost) {
@@ -87,12 +82,11 @@ public class GirlFriend_02 {
 
 				List<PointWeight> childNodes = roadMap.get(parent.nodeValue);
 				for (PointWeight pw : childNodes) {
-					Node node = new Node(pw.to, parent.paths, pw.weight, parent.weight);
+					Node node = new Node(pw.to, pw.weight, parent.weight);
 					if (!isValidNodeWeight(nodeWeights, node)) {
 						continue;
 					}
-					boolean isAdd = node.nodeValue > parent.nodeValue || !node.hasNode();
-					node.addSelfToPath();
+					boolean isAdd = node.nodeValue > parent.nodeValue;
 					if (isAdd) {
 						if (node.nodeValue == destination_house
 								&& (shortPathCost == -1 || shortPathCost > node.weight)) {
@@ -159,29 +153,16 @@ public class GirlFriend_02 {
 	private static class Node {
 		int nodeValue;
 		int weight;
-		List<Integer> paths;
 
 		public Node(int value) {
 			this.nodeValue = value;
 			weight = 0;
-			paths = new ArrayList<>(1);
-			paths.add(Integer.valueOf(value));
-
 		}
 
-		public Node(int nodeValue, List<Integer> aPaths, int childWeight, int parentWeight) {
+		public Node(int nodeValue, int childWeight, int parentWeight) {
 			this.nodeValue = nodeValue;
-			this.paths = new ArrayList<Integer>(aPaths);
 			int pathCost = (childWeight - parentWeight);
 			this.weight = ((pathCost < 0) ? 0 : pathCost) + parentWeight;
-		}
-
-		public boolean hasNode() {
-			return this.paths.indexOf(Integer.valueOf(this.nodeValue)) != -1;
-		}
-
-		public void addSelfToPath() {
-			this.paths.add(Integer.valueOf(this.nodeValue));
 		}
 
 		@Override
@@ -192,7 +173,7 @@ public class GirlFriend_02 {
 
 		@Override
 		public String toString() {
-			String result = nodeValue + " (" + weight + ") (" + paths + ")\n";
+			String result = nodeValue + " (" + weight + ")\n";
 
 			return result;
 		}
